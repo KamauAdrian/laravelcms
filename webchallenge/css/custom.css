@@ -1,0 +1,23 @@
+body{
+	font-size: 125%;
+}
+.cent{
+	text-align: center;
+}
+.bs_example1{
+	margin: 20px auto;
+	padding: 10px;
+}
+.test{
+	border-style: outset;
+	width: 49%;
+	height: 25px;
+	padding: 15px;
+	margin: 10px auto;
+}
+.error{
+	color: red;
+}
+.success{
+	color: green;
+}
