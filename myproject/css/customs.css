@@ -1,3 +1,6 @@
+body{
+    font-size: 135%;
+}
 .cent{
     text-align: center;
 }
@@ -10,4 +13,48 @@
 }
 .error{
     color: red;
+}
+.success{
+    color: green;
+}
+.btn-new{
+    float: left;
+    margin: 15px;
+}
+.navbar-brand{
+
+    font-size: 3em;
+}
+.new{
+    margin-top: 15px;
+}
+.btn1{
+    float: right;
+    margin-right: 20px;
+}
+.cont1{
+    border: 2px solid white;
+    margin-top: 25px;
+    margin-left: 50px;
+    margin-right: 50px;
+    height: 70%;
+    /*padding: 10px auto;*/
+
+}
+.inp1{
+    border-style: none;
+    margin-left: 175px;
+    width: 50%;
+    margin-top: 25px;
+    height: 50px;
+    border-bottom:1px solid black ;
+
+}
+.inp2{
+    border-style: none;
+    margin-left: 175px;
+    width: 70%;
+    margin-top: 25px;
+    height: 50px;
+    border-bottom:1px solid black ;
 }

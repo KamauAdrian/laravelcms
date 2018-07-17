@@ -1,7 +1,8 @@
 <?php
-$user_first_Err=$user_last_Err=$user_phone_Err=$user_email_Err=$gender_Err=$user_pass_Err=$user_pass1_Err="";
-$user_first=$user_last=$user_phone=$user_email=$gender=$user_pass=$user_pass1="";
-if ($_SERVER["REQUEST_METHOD"] == "POST"){
+session_start();
+$user_first_Err=$user_last_Err=$user_phone_Err=$user_email_Err=$gender_Err=$user_pass_Err=$user_pass1_Err=$user_log_Err=$user_feedback="";
+$user_first=$user_last=$user_phone=$user_email=$gender=$user_pass=$user_pass1=$log_name=$log_pass="";
+if (isset($_POST['register'])){
     if (empty($_POST['user_first'])){
         $user_first_Err='Please fill out this field';
     }else{
@@ -13,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
     if (empty($_POST['user_last'])){
         $user_last_Err='Please fill out this field';
     }else{
-        $user_last=$_POST['user_first'];
+        $user_last=$_POST['user_last'];
         if (!preg_match("/^[a-zA-z0-9 \s]+$/", $user_last)){
             $user_last_Err='Name can only contain letters or numbers';
         }
@@ -48,10 +49,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
     else{
         $user_pass=$_POST['user_pass'];
     }
-    if(empty($_POST['user_pass1'])){
-        $user_pass1_Err='must confirm password';
-    }
-    else{
+    if (empty($_POST['user_pass1'])){
+        $user_pass1_Err='Please confirm your password';
+    }else{
         $user_pass1=$_POST['user_pass1'];
     }
     if ($user_pass == $user_pass1){
@@ -61,6 +61,50 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
         $user_pass='';
         $user_pass1='';
     }
+    if (empty($user_first_Err) && empty($user_last_Err) && empty($user_phone_Err) && empty($user_email_Err) && empty($gender_Err) && empty($user_pass_Err))
+    {
+        include 'dbconn.php';
+        $result=mysqli_query($conn,"INSERT INTO members VALUES ('','$user_first','$user_last','$user_phone','$user_email','$gender','$final_pass')");
+        if ($result == true){
+            $user_feedback='Registered successfully ! You can now use your email address to log in';
+        }else{
+            $user_feedback='An Error during registration Please try again later';
+        }
+
+
+
+        $user_first='';
+        $user_last='';
+        $user_phone='';
+        $user_email='';
+        $user_pass='';
+        $user_pass1='';
+    }
+}
+if (isset($_POST['log_in'])) {
+if (empty($_POST['log_name'])){
+    $user_log_Err='Enter your email address and password to continue';
+
+}else{
+    $log_name=$_POST['log_name'];
+}
+if (empty($user_log_Err) && !empty($_POST['log_pass'])){
+    $log_pass=$_POST['log_pass'];
+    $ins_pass=md5($log_pass);
+    include 'dbconn.php';
+
+    $query="SELECT * FROM members WHERE email='$log_name' && password ='$ins_pass'";
+    $new_res=mysqli_query($conn,$query);
+  $count=mysqli_num_rows($new_res);
+  if ($count==1){
+    $_SESSION["user"]=$log_name;
+    $_SESSION["password"]=$ins_pass;
+
+    header('location:dashboard.php');
+  }else{
+      $user_log_Err="invalid user name or password";
+  }
+}
 }
 ?>
 <!DOCTYPE html>
@@ -69,14 +113,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
     <title>Index</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="css/bootstrap.css" />
-    <link rel="stylesheet" href="css/customs.css" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="css/customs.css" />
 </head>
 <body>
 <nav class="nav navbar-default">
     <div class="container-fluid">
         <div class="navbar-header">
-            <button class="navbar-toggle" data-target="collapse" data-toggle="#mynav">
+            <button type="button" class="navbar-toggle" data-target="collapse" data-toggle="#mynav">
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
@@ -84,23 +128,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
             <a href="#" class="navbar-brand">BLOG POST</a>
         </div>
         <div class="collapse navbar-collapse" id="mynav">
-            <ul class="nav navbar-nav">
-                <li class="active"><a href="#">Home</a></li>
-                <li><a href="#">About Blog</a> </li>
-                <li><a href="#">Blog</a> </li>
-            </ul>
+<!--            <ul class="nav navbar-nav">-->
+<!--                <li class="active"><a href="#">Home</a></li>-->
+<!--                <li><a href="#">About Blog</a> </li>-->
+<!--                <li><a href="#">Blog</a> </li>-->
+<!--            </ul>-->
             <form method="post" class="navbar-form navbar-right">
                 <div class="form-group">
-                    <label for="user_log">Email or phone :</label>
-                    <input type="text" name="user_name" class="form-control" id="user_log" placeholder="Email or phome"/>
+                    <label for="user_log">Email Address:</label>
+                    <input type="text" name="log_name" class="form-control" id="user_log" placeholder="Email Address"/>
                 </div>
                 <div class="form-group">
                     <label for="user_pass">Password :</label>
-                    <input type="password" name="user_pass" class="form-control" id="user_pass" placeholder="password"/>
+                    <input type="password" name="log_pass" class="form-control" id="user_pass" placeholder="password"/>
                 </div>
                 <div class="form-group">
-                    <input type="submit" class="btn btn-success" name="login"/>
+                    <input type="submit" class="btn btn-success" name="log_in" value="Sign-in"/>
                 </div><br />
+                <div class="form-group">
+                    <p><span class="error"><?php echo $user_log_Err?></span></p>
+                </div><br>
                 <div class="form-group">
                     <a href="#">forgot password</a>
                 </div>
@@ -111,7 +158,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
 <div class="container-fluid">
     <div class="row">
         <div class="col-sm-5 col-xm-12">
-            <h1 class="cent">WELCOME TO BLOG</h1>
+            <h1 class="cent">WELCOME TO BLOG</h1><br />
+            <img src="images/im.png">
         </div>
         <div class="col-sm-7 col-xm-12">
             <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF'])?>">
@@ -175,6 +223,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
                         <br />
                         <div class="form-group">
                             <input type="submit" name="register" value="Sign up" class="btn btn-success"/>
+                            <span class="success"><?php echo $user_feedback;?></span>
                         </div>
                     </div>
                 </div>
